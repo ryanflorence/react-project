@@ -1,6 +1,6 @@
 {
   "name": "react-project",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "State of the art web development with React",
   "main": "index.js",
   "files": [
@@ -46,7 +46,7 @@
     "express": "4.13.4",
     "extract-text-webpack-plugin": "1.0.1",
     "json-loader": "0.5.4",
-    "prompt-sync": "3.0.0",
+    "prompt-sync": "3.0.1",
     "react": "0.14.7",
     "react-dom": "0.14.7",
     "shelljs": "0.6.0",
