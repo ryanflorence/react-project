@@ -27,13 +27,16 @@ import { log } from './LogUtils'
 import { PORT, APP_PATH, PUBLIC_DIR } from './Constants'
 import ErrorMessage from './ErrorMessage'
 
-export function createServer({ renderDocument, renderApp, routes }) {
+export function createServer({ renderDocument, renderApp, routes, devMiddlewares, prodMiddlewares }) {
   const server = express()
   const webpackStats = getWebpackStats()
 
   if (process.env.NODE_ENV === 'production') {
     server.use(compression())
+    prodMiddlewares(server)
     server.use(express.static(PUBLIC_DIR))
+  } else {
+    devMiddlewares(server)
   }
 
   server.disable('x-powered-by')
