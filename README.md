@@ -1,9 +1,11 @@
 React Project: State of the Art Web Development
 ===============================================
 
-This is brand new, not ready for production unless you are ready and
-willing to contribute to the project. Basically just building something
-we want here, if it interests you, please help :)
+This is a Node.js module that will create a React/Express/React Router 
+environment for its parent project. It is brand new, not ready for 
+production unless you are ready and willing to contribute to the 
+project. Basically just building something we want here, if it 
+interests you, please help :)
 
 Also, it has no tests. Also, it's awesome.
 
