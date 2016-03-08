@@ -4,8 +4,8 @@ import webpack from 'webpack'
 import WebpackDevServer from 'webpack-dev-server'
 import build from './build'
 import { log, logError, promptApproval } from './LogUtils'
-import { getPackageJSON, pkgPath, getDXConfig, copyProps } from './PackageUtils'
-import { DEV_PORT, APP_PATH } from './Constants'
+import { getPackageJSON, getDXConfig } from './PackageUtils'
+import { DEV_PORT, DEV_HOST, APP_PATH } from './Constants'
 
 export default function start(cb) {
   if (process.env.NODE_ENV === 'production') {
@@ -23,7 +23,7 @@ export default function start(cb) {
 function checkDependencies() {
   log('checking app dependencies')
   const pkg = getPackageJSON()
-  const blueprintPkg = require('../blueprint_package.json')
+  const blueprintPkg = require('../create-react-project/blueprint/package.json')
   const missingDeps = []
   const differentDeps = []
   for (const key in blueprintPkg.dependencies) {
@@ -70,7 +70,7 @@ function runDevServer(cb) {
   const { ClientDevConfig } = require(configPath)
   const compiler = webpack(ClientDevConfig)
   const server = new WebpackDevServer(compiler, ClientDevConfig.devServer)
-  server.listen(DEV_PORT, 'localhost', () => {
+  server.listen(DEV_PORT, DEV_HOST, () => {
     log('Webpack dev server listening on port', DEV_PORT)
     cb()
   })

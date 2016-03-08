@@ -1,0 +1,24 @@
+{
+  "name": "create-react-project",
+  "version": "0.0.22",
+  "description": "Create a React Project boilerplate.",
+  "main": "index.js",
+  "files": [
+    "blueprint",
+    "scripts",
+    "index.js",
+    "README.md"
+  ],
+  "bin": {
+    "create-react-project": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "./scripts/postinstall.js"
+  },
+  "author": "Ryan Florence",
+  "license": "ISC",
+  "dependencies": {
+    "shelljs": "0.6.0"
+  }
+}

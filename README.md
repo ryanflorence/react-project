@@ -13,6 +13,16 @@ Also, it has no tests. Also, it's awesome.
 
 
 
+
+## Node/NPM Versions
+
+I'm running node v5.7.0 and npm v3.6.0 as I tinker, there's no plan to
+support older versions at the moment.
+
+
+
+
+
 ## Contributing
 
 Please see [CONTRIBUTING.md](/CONTRIBUTING.md)
@@ -22,28 +32,16 @@ Please see [CONTRIBUTING.md](/CONTRIBUTING.md)
 
 ## Getting Started
 
-Don't clone this repo, it's not a boilerplate. Do this:
+The quickest way to get started is to use `create-react-project`.
 
 ```sh
-# don't like global npm installs, so you get to make the project
-mkdir best-app-of-your-life
-cd best-app-of-your-life
-npm init .
-# follow prompts
-
-# react project is a dependency, not a boilerplate, install it
-npm install react-project --save
-
-# You probably want a bit of boilerplate to get started though.
-# There isn't much here, it just connects the pieces that
-# react-project gives you
-node_modules/.bin/react-project init
-# follow prompts
-
-# and from now on you only deal with npm scripts
+npm install -g create-react-project
+create-react-project the-best-app-ever
+cd the-best-app-ever
 npm install
 npm start
 ```
+
 
 Now open [http://localhost:8080](http://localhost:8080).
 
@@ -65,6 +63,9 @@ NODE_ENV=production npm start
 Minified, gzipped, long-term hashed assets and server-pre-rendering, and
 more.
 
+You can use this as a dependency of an existing app. For now,
+the result of `create-react-project` is your best documentation on how
+to do that.
 
 
 
@@ -181,6 +182,9 @@ PORT=8080
 # webpack dev server port
 DEV_PORT=8081
 
+# webpack dev server host
+DEV_HOST=localhost
+
 # where to find assets, point to a CDN on production box
 PUBLIC_PATH=/
 
@@ -204,11 +208,11 @@ loader][bundle-loader].
 import { lazy } from 'react-project'
 
 // bundle loader returns a function here that will load `Dashboard`
-// lazily, it won't be in the intial bundle
+// lazily, it won't be in the initial bundle
 import loadDashboard from 'bundle?lazy!./Dashboard'
 
 // now wrap that load function with `lazy` and you're done, you've got
-// super simple code splitting, the dashboad code won't be downloaded
+// super simple code splitting, the dashboard code won't be downloaded
 // until the user visits this route
 <Route getComponent={lazy(loadDashboard)}/>
 
@@ -229,8 +233,8 @@ Defines a route to only be available on the server. Add handlers
 routes. But only until somebody implements HMR for the server.
 
 You can nest routes to get path nesting, but only the final matched
-route's handler is called (maybe we could do somethign cool later with
-the handlers?!)
+route's handler is called (maybe we could do something cool later with
+the handlers?)
 
 ```js
 import { ServerRoute } from 'react-project/server'
@@ -258,14 +262,25 @@ export default (
 )
 ```
 
+#### `serverRouteHandler(req, res, { params, location, route })`
+
+- `req` an express request object
+- `res` an express resonponse object
+- `params` the url parameters
+- `location` the matched location
+- `route` the matched server route
+
 
 ### `react-project/server`
 
-#### `createServer({ renderDocument, renderApp, routes })`
+#### `createServer(getApp)`
 
 ```
 import { createServer } from 'react-project/server'
-createServer({ renderDocument, renderApp, routes }).start()
+
+createServer((req, res, cb) => {
+  cb(null, { renderDocument, renderApp, routes })
+}).start()
 ```
 
 Creates and returns a new [Express][express] server, with a new
@@ -308,7 +323,7 @@ npm scripts.
 
 #### `react-project init`
 
-Initializes the app, copies over a bluebrint app, updates package.json
+Initializes the app, copies over a blueprint app, updates package.json
 with tasks, etc.
 
 #### `react-project build`

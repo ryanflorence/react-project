@@ -1,12 +1,11 @@
 {
   "name": "react-project",
-  "version": "0.0.7",
+  "version": "0.0.22",
   "description": "State of the art web development with React",
   "main": "index.js",
   "files": [
     "bin/react-project.js",
-    "blueprint",
-    "blueprint_package.json",
+    "create-react-project/blueprint/package.json",
     "lib",
     "index.js",
     "server.js",
@@ -20,7 +19,8 @@
   "scripts": {
     "build": "babel modules --out-dir lib",
     "test": "npm run build && NODE_ENV=test mocha tests.js --compilers js:babel-register",
-    "release": "scripts/release.sh"
+    "release": "scripts/release.sh",
+    "start": "nodemon --watch modules --exec 'npm run build'"
   },
   "author": "Ryan Florence",
   "license": "ISC",
@@ -51,6 +51,7 @@
     "eslint-config-rackt": "1.1.1",
     "eslint-plugin-react": "3.16.1",
     "expect": "1.14.0",
-    "mocha": "2.4.5"
+    "mocha": "2.4.5",
+    "nodemon": "1.9.1"
   }
 }
