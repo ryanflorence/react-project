@@ -265,7 +265,7 @@ import {
 } from './events'
 
 export default (
-  <Route path="/api">
+  <ServerRoute path="/api">
     <ServerRoute path="events"
       get={listEvents}
       post={createEvent}
@@ -276,7 +276,7 @@ export default (
         delete={deleteEvent}
       />
     </ServerRoute>
-  </Route>
+  </ServerRoute>
 )
 ```
 
