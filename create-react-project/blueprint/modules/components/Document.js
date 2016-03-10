@@ -1,4 +1,5 @@
 import React from 'react'
+import favicon from '../favicon.ico'
 
 const { arrayOf, string, node, object } = React.PropTypes
 
@@ -19,23 +20,19 @@ const Document = React.createClass({
   },
 
   render() {
-    const { styles, scripts, content, title, initialState } = this.props
+    const { styles, scripts, content, title } = this.props
 
     return (
       <html>
         <head>
           <meta charSet="utf-8"/>
+          <link rel="shortcut icon" href={favicon}/>
           <title>{title}</title>
           {styles}
         </head>
         <body>
           <div id="app" dangerouslySetInnerHTML={{ __html: content }}/>
           <script dangerouslySetInnerHTML={{ __html: shims }}/>
-          {initialState &&
-            <script dangerouslySetInnerHTML={{
-              __html: `window.__INITIAL_STATE__ = ${JSON.stringify(initialState)};`
-            }}/>
-          }
           {scripts}
         </body>
       </html>

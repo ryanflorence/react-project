@@ -2,6 +2,14 @@ import webpack from 'webpack'
 import fs from 'fs'
 import path from 'path'
 import * as SHARED from './webpack.shared.config'
+import { DEV_PORT, DEV_HOST, PUBLIC_PATH } from './Constants'
+import { getDXConfig } from './PackageUtils'
+
+const PROD = process.env.NODE_ENV === 'production'
+
+function getPublicPath() {
+  return PROD ? PUBLIC_PATH : `http://${DEV_HOST}:${DEV_PORT}/`
+}
 
 const nodeModules = fs.readdirSync(
   path.join(SHARED.APP_PATH, 'node_modules')
@@ -15,25 +23,15 @@ export default {
 
   devtool: 'sourcemap',
 
-  entry: path.resolve(SHARED.SERVER_ENTRY),
+  entry: path.resolve(SHARED.APP_PATH, getDXConfig().server),
 
   output: {
     path: path.join(SHARED.APP_PATH, '.build'),
-    filename: 'server.js'
+    filename: 'server.js',
+    publicPath: getPublicPath()
   },
 
-  // keep node_module paths out of the bundle
-  externals: [
-    function (context, request, callback) {
-      const pathStart = request.split('/')[0]
-      // keep react-project stuff *in* the bundle so it gets processed through babel (and we don't
-      // need to ship a prebundled version :D)
-      if (nodeModules.indexOf(pathStart) >= 0 && request !== 'react-project' && request !== 'react-project/server') {
-        return callback(null, 'commonjs ' + request)
-      }
-      callback()
-    }
-  ],
+  externals: getExternals(),
 
   node: {
     __filename: true,
@@ -41,18 +39,27 @@ export default {
   },
 
   module: {
-    loaders: SHARED.LOADERS.concat([
+    loaders: [
+      { test: SHARED.JSON_REGEX,
+        loader: 'json-loader'
+      },
+      { test: SHARED.FONT_REGEX,
+        loader: 'url-loader?limit=10000'
+      },
+      { test: SHARED.IMAGE_REGEX,
+        loader: 'url-loader?limit=10000'
+      },
       { test: SHARED.JS_REGEX,
         loader: 'babel-loader',
         exclude: /node_modules/
       },
       { test: SHARED.CSS_REGEX,
-        loader: `css-loader?${SHARED.CSS_LOADER_QUERY}!postcss-loader`
+        loader: `css-loader/locals?${SHARED.CSS_LOADER_QUERY}!postcss-loader`
       }
-    ])
+    ]
   },
 
-  plugins: SHARED.PLUGINS.concat([
+  plugins: [
     new webpack.BannerPlugin(
       'require("source-map-support").install();',
       { raw: true, entryOnly: false }
@@ -60,7 +67,26 @@ export default {
     new webpack.ProvidePlugin({
       fetch: 'node-fetch'
     })
-  ])
+  ]
 
+}
+
+function getExternals() {
+  // keep node_module paths out of the bundle
+  return [
+    function (context, request, callback) {
+      const pathStart = request.split('/')[0]
+      // can't remember why we need to bundle up react-project stuff ...
+      if (
+        nodeModules.indexOf(pathStart) >= 0 &&
+        request !== 'react-project' &&
+        request !== 'react-project/server'
+      ) {
+        callback(null, 'commonjs ' + request)
+      } else {
+        callback()
+      }
+    }
+  ]
 }
 

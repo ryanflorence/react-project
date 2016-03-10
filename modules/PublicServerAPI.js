@@ -15,6 +15,7 @@
 import fs from 'fs'
 import express from 'express'
 import bodyParser from 'body-parser'
+import morgan from 'morgan'
 import React from 'react'
 import { renderToString, renderToStaticMarkup } from 'react-dom/server'
 import path from 'path'
@@ -24,23 +25,24 @@ import compression from 'compression'
 import hpp from 'hpp'
 import helmet from 'helmet'
 import { log } from './LogUtils'
-import { PORT, APP_PATH, PUBLIC_DIR } from './Constants'
+import { PORT, APP_PATH, PUBLIC_DIR, SERVER_RENDERING } from './Constants'
 import ErrorMessage from './ErrorMessage'
+
+const PROD = process.env.NODE_ENV === 'production'
 
 export function createServer(getApp) {
   const server = express()
   const webpackStats = getWebpackStats()
   server.disable('x-powered-by')
-  addProductionOnlyMiddleware(server)
-  addMiddleware(server)
   server._listen = server.listen
   server.listen = () => {
     throw new Error('[react-project]', 'Do not call `server.listen()`, use `server.start()`')
   }
 
   server.start = () => {
+    addMiddleware(server)
     server.all('*', (req, res) => {
-      getApp(req, res, (err, { renderDocument, renderApp, routes }) => {
+      getApp(req, res, (err, { render, routes }) => {
         if (err) {
           onError(err, req, res)
         } else {
@@ -52,7 +54,7 @@ export function createServer(getApp) {
               // will need to make changes in React Router or history probably
               res.redirect(redirect.pathname + redirect.search)
             } else if (routerProps) {
-              sendWithReactRouter({ req, res, renderApp, renderDocument, webpackStats, routerProps })
+              sendWithReactRouter({ req, res, render, webpackStats, routerProps })
             } else {
               sendNoRoutesMatched(res)
             }
@@ -72,13 +74,19 @@ export function createServer(getApp) {
 }
 
 function addProductionOnlyMiddleware(server) {
-  if (process.env.NODE_ENV === 'production') {
-    server.use(compression())
-    server.use(express.static(PUBLIC_DIR))
+  if (PROD) {
   }
 }
 
 function addMiddleware(server) {
+  if (process.env.NODE_ENV === 'production') {
+    server.use(morgan('combined'))
+    server.use(compression())
+    server.use(express.static(PUBLIC_DIR))
+  } else {
+    server.use(morgan('dev'))
+  }
+
   server.use(express.static(path.join(APP_PATH, 'static')))
   server.use(bodyParser.json())
   server.use(hpp())
@@ -99,11 +107,11 @@ function addMiddleware(server) {
   server.use(helmet.noSniff())
 }
 
-function sendWithReactRouter({ req, res, renderApp, renderDocument, webpackStats, routerProps }) {
+function sendWithReactRouter({ req, res, render, webpackStats, routerProps }) {
   const { routes } = routerProps
   const lastRoute = routes[routes.length - 1]
   if (lastRoute.isServerRoute) {
-    handleServerRoute(req, res, lastRoute {
+    handleServerRoute(req, res, lastRoute, {
       params: routerProps.params,
       location: routerProps.location,
       routes: routerProps.routes,
@@ -112,23 +120,22 @@ function sendWithReactRouter({ req, res, renderApp, renderDocument, webpackStats
   } else if (req.method !== 'GET') {
     sendNoRoutesMatched(res)
   } else {
-    renderApp(routerProps, (err, appElement, initialState = {}) => {
-      const status = err ? err.status : (lastRoute.status || 200)
-      const content = getContent(req, appElement)
-      renderDocument({
-        title: flushTitle(),
-        content: content,
-        scripts: getJavaScriptTags(webpackStats),
-        styles: getStyleTags(webpackStats),
-        initialState
-      }, (err, documentElement) => {
-        if (err) {
-          onError(err, req, res)
-        } else {
-          const markup = renderToStaticMarkup(documentElement)
-          res.status(status).send(`<!doctype html>\n${markup}`)
-        }
-      })
+    render(routerProps, (err, { renderDocument, renderApp }) => {
+      if (err) {
+        onError(err, req, res)
+      } else {
+        const status = err ? err.status : (lastRoute.status || 200)
+        const appElement = renderApp(routerProps)
+        const content = getContent(req, appElement)
+        const documentElement = renderDocument({
+          title: flushTitle(),
+          content: content,
+          scripts: getJavaScriptTags(webpackStats),
+          styles: getStyleTags(webpackStats)
+        })
+        const markup = renderToStaticMarkup(documentElement)
+        res.status(status).send(`<!doctype html>\n${markup}`)
+      }
     })
   }
 }
@@ -168,7 +175,7 @@ function getWebpackStats() {
 }
 
 function getContent(req, appElement) {
-  return (process.env.NODE_ENV === 'production' || req.query.__ssr != null) ?
+  return (SERVER_RENDERING) ?
     renderToString(appElement) : ''
 }
 

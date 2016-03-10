@@ -1,6 +1,6 @@
 {
   "name": "react-project",
-  "version": "0.0.22",
+  "version": "0.0.24",
   "description": "State of the art web development with React",
   "main": "index.js",
   "files": [
@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "assert": "1.3.0",
+    "babel-cli": "6.6.5",
     "babel-eslint": "4.1.8",
     "babel-preset-es2015": "6.5.0",
     "babel-preset-react": "6.5.0",
