@@ -55,6 +55,9 @@ export default {
       },
       { test: SHARED.CSS_REGEX,
         loader: `css-loader/locals?${SHARED.CSS_LOADER_QUERY}!postcss-loader`
+      },
+      { test: SHARED.SCSS_REGEX,
+        loader: `css-loader/locals?${SHARED.CSS_LOADER_QUERY}!sass-loader`
       }
     ]
   },
