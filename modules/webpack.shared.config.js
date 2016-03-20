@@ -9,6 +9,7 @@ export const NODE_ENV = process.env.NODE_ENV
 export const FONT_REGEX = /\.(otf|eot|svg|ttf|woff|woff2).*$/
 export const IMAGE_REGEX = /\.(gif|jpe?g|png|ico)$/
 export const CSS_REGEX = /\.css$/
+export const SCSS_REGEX = /\.scss$/
 export const JS_REGEX = /\.js$/
 export const JSON_REGEX = /\.json$/
 export const JS_EXCLUDE_REGEX = /node_modules/
