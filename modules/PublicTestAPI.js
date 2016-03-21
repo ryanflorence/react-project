@@ -1,7 +1,6 @@
 /*eslint no-console: 0*/
 import webpack from 'webpack'
-import * as SHARED from './webpack.shared.config'
-import * as SHARED_CLIENT from './webpack.shared.client.config'
+import CLIENT from './webpack.client.config'
 
 export function KarmaConf(config) {
   config.set({
@@ -18,13 +17,7 @@ export function KarmaConf(config) {
     webpack: {
       devtool: 'inline-source-map',
       module: {
-        loaders: SHARED_CLIENT.LOADERS.concat([
-          SHARED_CLIENT.STYLE_LOADER,
-          { test: SHARED.JS_REGEX,
-            exclude: SHARED.JS_EXCLUDE_REGEX,
-            loader: 'babel'
-          }
-        ])
+        loaders: CLIENT.module.loaders
       },
       plugins: [
         new webpack.DefinePlugin({
@@ -41,4 +34,3 @@ export function KarmaConf(config) {
   })
 
 }
-
