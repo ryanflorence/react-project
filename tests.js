@@ -19,6 +19,16 @@ if (process.env.FAST) {
   exec('npm install')
 }
 
+describe('build task', () => {
+  it('compiles the modules in the lib directory', function () {
+    cd('modules')
+    const moduleList = ls('-A')
+    cd('../lib')
+    const libList = ls('-A')
+    expect(libList).toEqual(moduleList)
+  })
+})
+
 describe('create-react-project', () => {
   it('initializes a new project', function () {
     cd(TEST_DIR)
@@ -113,4 +123,3 @@ describe('react-project/server', () => {
     })
   })
 })
-
