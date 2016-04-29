@@ -15,12 +15,14 @@ function getAppWebpackConfig() {
   return require(WEBPACK_PATH)
 }
 
-export default function start(cb) {
+export default function start(cb, option) {
   validateEnv()
   if (PROD) {
     logDXStartWarning()
   } else {
-    checkDependencies()
+    if (option !== '--avoid-dependencies-check') {
+      checkDependencies()
+    }
     build(() => {
       const appServerPath = path.join(process.cwd(), '.build', 'server.js')
       require(appServerPath)
@@ -88,4 +90,3 @@ function runDevServer(cb) {
     cb()
   })
 }
-
