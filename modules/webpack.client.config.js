@@ -74,10 +74,10 @@ function getCSSLoader() {
   if (PROD || SERVER_RENDERING) {
     loader.loader = ExtractTextPlugin.extract(
       'style-loader',
-      `css-loader?${SHARED.CSS_LOADER_QUERY}!postcss-loader`
+      `css-loader?${SHARED.CSS_LOADER_QUERY}!postcss-loader!sass-loader`
     )
   } else {
-    loader.loader = `style-loader!css-loader?${SHARED.CSS_LOADER_QUERY}!postcss-loader`
+    loader.loader = `style-loader!css-loader?${SHARED.CSS_LOADER_QUERY}!postcss-loader!sass-loader`
   }
   return loader
 }
