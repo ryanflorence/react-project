@@ -208,5 +208,3 @@ function sendNoRoutesMatched(res) {
     </ErrorMessage>
   ))
 }
-
-
