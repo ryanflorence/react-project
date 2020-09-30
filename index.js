@@ -1,2 +1,2 @@
-module.exports = require('./lib//PublicAPI')
+module.exports = require('./lib//PublicAPI');
 
